@@ -14,6 +14,11 @@ const setupSwagger = require('./swagger');
 
 const app = express();
 
+// *** Ajout route racine ***
+app.get('/', (req, res) => {
+  res.send('API ClickDeal Backend fonctionne ! 🚀');
+});
+
 // Middlewares globaux
 app.use(cors());
 app.use(express.json());

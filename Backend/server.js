@@ -7,6 +7,6 @@ const PORT = process.env.PORT || 8080;
 // Connexion DB puis lancement serveur
 connectDB().then(() => {
   app.listen(PORT, () => {
-    console.log(`🚀 Serveur lancé sur http://localhost:${PORT}`);
+    console.log(` Serveur lancé sur http://localhost:${PORT}`);
   });
 });
