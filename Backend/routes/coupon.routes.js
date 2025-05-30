@@ -52,7 +52,28 @@ const checkCompanyProfileComplete = require('../middlewares/checkCompanyProfileC
  *         description: Liste des coupons
  */
 router.get('/', couponCtrl.getAllCoupons);
+/**
+ * @swagger
+ * /coupons/getmycoupons:
+ *   get:
+ *     summary: Voir tous les coupons de l’entreprise connectée
+ *     tags: [Coupons]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Liste des coupons de l’entreprise
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Coupon'
+ *       401:
+ *         description: Non autorisé
+ */
 
+router.get('/mine', protect, couponCtrl.getMyCoupons);
 /**
  * @swagger
  * /coupons/{id}:
@@ -209,27 +230,6 @@ router.put('/:id', protect, couponCtrl.updateCoupon);
 router.delete('/:id', protect, couponCtrl.deleteCoupon);
 router.post('/:id/view', couponCtrl.incrementView);
 router.post('/:id/download', couponCtrl.incrementDownload);
-/**
- * @swagger
- * /coupons/getmycoupons:
- *   get:
- *     summary: Voir tous les coupons de l’entreprise connectée
- *     tags: [Coupons]
- *     security:
- *       - bearerAuth: []
- *     responses:
- *       200:
- *         description: Liste des coupons de l’entreprise
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/Coupon'
- *       401:
- *         description: Non autorisé
- */
 
-router.get('/mine', protect, couponCtrl.getMyCoupons);
 
 module.exports = router;

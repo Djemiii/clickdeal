@@ -40,11 +40,9 @@ const authValidator = require('../validations/auth.validation');
  *                 example: monMotDePasse123
  *               role:
  *                 type: string
- *                 enum: [entreprise, consommateur]
+ *                 enum: [entreprise, consommateur,admin]
  *                 example: consommateur
- *               secteurActivite:
- *                 type: string
- *                 example: Restauration
+ *             
  *     responses:
  *       201:
  *         description: Utilisateur créé avec succès

@@ -31,6 +31,8 @@ exports.getAllCoupons = async (req, res, next) => {
 exports.getMyCoupons = async (req, res, next) => {
   try {
     const coupons = await couponService.getMyCoupons(req.user._id);
+      console.log("User connecté :", req.user);
+
     res.status(200).json(coupons);
   } catch (err) {
     next(err);
