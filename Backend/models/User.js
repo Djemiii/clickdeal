@@ -31,9 +31,10 @@ const userSchema = new mongoose.Schema({
     type: String,
     enum: ['entreprise', 'consommateur','admin'],
     default: 'consommateur'
-  },lastSpinAt: {
+  },
+lastSpinAt: {
   type: Date,
-  default: null,
+  default:null
 }
 
 }, {

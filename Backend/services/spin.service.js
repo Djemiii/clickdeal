@@ -6,14 +6,20 @@ const AppError = require('../utils/AppError');
 const notificationService = require('./notification.service');
 
 exports.spinWheel = async (user) => {
+  // 1) Définir "aujourd'hui" (de 00h00 à 23h59)
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
-  if (user.lastSpinAt && user.lastSpinAt >= today) {
-    throw new AppError("Vous avez déjà tourné la roue aujourd'hui", 429);
+  // 2) Compter combien de fois l'utilisateur a joué aujourd'hui
+  const howManyTimesToday = await SpinHistory.countDocuments({
+    user: user._id,
+    date: { $gte: today }  // Depuis aujourd'hui 00h00
+  });
+
+  if (howManyTimesToday >= 3) {
+    throw new AppError("Vous avez déjà joué 3 fois aujourd'hui", 429);
   }
 
-  // Sélection d’un coupon approuvé et actif, au hasard
   const [coupon] = await Coupon.aggregate([
     { $match: { isApproved: true, isActive: true } },
     { $sample: { size: 1 } }
@@ -23,26 +29,26 @@ exports.spinWheel = async (user) => {
     throw new AppError("Aucun coupon disponible actuellement", 404);
   }
 
-  // Mise à jour de la date de dernier spin
   user.lastSpinAt = new Date();
   await user.save();
 
-  // Enregistrement de l’historique
   await SpinHistory.create({
     user: user._id,
     coupon: coupon._id
   });
 
-  // Notification
   await notificationService.sendNotification(
     user._id,
     'spin_won',
     `Félicitations ! Vous avez gagné le coupon "${coupon.title}"`
   );
 
+  const jeuRestant = 3 - (howManyTimesToday + 1);
+
   return {
     message: "Bravo, vous avez gagné !",
-    coupon
+    coupon,
+    jeuRestant: jeuRestant
   };
 };
 
