@@ -8,5 +8,7 @@ const PORT = process.env.PORT || 8080;
 connectDB().then(() => {
   app.listen(PORT, '0.0.0.0', () => {
     console.log(` Serveur lancé sur http://localhost:${PORT}`);
+     
+  console.log(`📍 Environment: ${process.env.NODE_ENV || 'development'}`);
   });
 });
