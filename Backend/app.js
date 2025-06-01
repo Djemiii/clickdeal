@@ -20,7 +20,9 @@ app.get('/', (req, res) => {
 });
 
 // Middlewares globaux
-app.use(cors());
+app.use(cors({
+  origin: '*', 
+}));
 app.use(express.json());
 app.use(morgan('dev'));
 
@@ -40,5 +42,10 @@ setupSwagger(app);
 
 // Gestion globale des erreurs
 app.use(errorHandler);
+
+app.get('/ping', (req, res) => {
+  res.send('pong');
+});
+
 
 module.exports = app;
