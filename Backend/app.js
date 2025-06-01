@@ -8,7 +8,7 @@ const userRoutes = require('./routes/user.routes');
 const couponRoutes = require('./routes/coupon.routes');
 const spinRoutes = require('./routes/spin.routes');
 const adminRoutes = require('./routes/admin.routes');
-
+const notificationRoutes = require('./routes/notification.route');
 const errorHandler = require('./middlewares/error.middleware');
 const setupSwagger = require('./swagger');
 
@@ -16,7 +16,7 @@ const app = express();
 
 // *** Ajout route racine ***
 app.get('/', (req, res) => {
-  res.send('API ClickDeal Backend fonctionne ! 🚀');
+  res.send('API ClickDeal Backend fonctionne !');
 });
 
 // Middlewares globaux
@@ -33,7 +33,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/coupons', couponRoutes);
 app.use('/api/spin', spinRoutes);
 app.use('/api/admin', adminRoutes);
-app.use('/api/notifications', require('./routes/notification.route'));
+app.use('/api/notifications', notificationRoutes);
 
 // Swagger Docs
 setupSwagger(app);
