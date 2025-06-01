@@ -10,7 +10,7 @@ const options = {
       version: '1.0.0',
       description: 'API de la plateforme ClickDeal - Coupons pour entreprises locales'
     },
-    servers: [{ url: 'http://localhost:5000/api' }]
+    servers: [{ url: 'http://localhost:8080/api' }]
   },
   apis: ['./routes/*.js']
 };

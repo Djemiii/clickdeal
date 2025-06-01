@@ -29,7 +29,7 @@ const userSchema = new mongoose.Schema({
   },
   role: {
     type: String,
-    enum: ['entreprise', 'consommateur,admin'],
+    enum: ['entreprise', 'consommateur','admin'],
     default: 'consommateur'
   },lastSpinAt: {
   type: Date,
