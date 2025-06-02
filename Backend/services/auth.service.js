@@ -11,10 +11,7 @@ const generateToken = (user) => {
 exports.register = async (data) => {
   const userExists = await User.findOne({ email: data.email });
   if (userExists) throw new AppError('Utilisateur déjà existant', 400);
-
   const user = await User.create(data);
-
-  // ❌ Ne génère pas le token ici
   return { user };
 };
 
