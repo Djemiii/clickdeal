@@ -1,59 +1,96 @@
-// services/spin.service.js
-
 const Coupon = require('../models/Coupon');
 const SpinHistory = require('../models/SpinHistory');
 const AppError = require('../utils/AppError');
 const notificationService = require('./notification.service');
 
 exports.spinWheel = async (user) => {
-  // 1) Définir "aujourd'hui" (de 00h00 à 23h59)
+  // 1) Vérifier la limite quotidienne (3 fois par jour)
   const today = new Date();
   today.setHours(0, 0, 0, 0);
-
-  // 2) Compter combien de fois l'utilisateur a joué aujourd'hui
+  
   const howManyTimesToday = await SpinHistory.countDocuments({
     user: user._id,
-    date: { $gte: today }  // Depuis aujourd'hui 00h00
+    date: { $gte: today }
   });
 
   if (howManyTimesToday >= 3) {
     throw new AppError("Vous avez déjà joué 3 fois aujourd'hui", 429);
   }
 
-  const [coupon] = await Coupon.aggregate([
-    { $match: { isApproved: true, isActive: true } },
-    { $sample: { size: 1 } }
-  ]);
+  // 2) Définir les probabilités (simple à comprendre)
+  const CHANCE_WIN = 30; // 30% de chance de gagner
+  const randomNumber = Math.floor(Math.random() * 100) + 1; // 1 à 100
+  
+  console.log(`🎲 Nombre tiré: ${randomNumber} (Chance de gagner: ${CHANCE_WIN}%)`);
 
-  if (!coupon) {
-    throw new AppError("Aucun coupon disponible actuellement", 404);
+  let result;
+
+  if (randomNumber <= CHANCE_WIN) {
+    // Récupérer un coupon exclusif aléatoire
+    const exclusiveCoupons = await Coupon.find({
+      isApproved: true,
+      isActive: true,
+      isExclusif: true  
+    });
+
+    if (exclusiveCoupons.length === 0) {
+      // Pas de coupons exclusifs 
+      result = {
+        isWinner: false,
+        message: "Oups ! Aucun coupon exclusif disponible pour le moment",
+        coupon: null
+      };
+    } else {
+      // Choisir un coupon exclusif au hasard
+      const randomIndex = Math.floor(Math.random() * exclusiveCoupons.length);
+      const wonCoupon = exclusiveCoupons[randomIndex];
+
+      result = {
+        isWinner: true,
+        message: `🎉 Félicitations ! Vous avez gagné un coupon exclusif !`,
+        coupon: wonCoupon
+      };
+
+      await notificationService.sendNotification(
+        user._id,
+        'spin_won',
+        `Bravo ! Coupon exclusif "${wonCoupon.title}" gagné à la roue !`
+      );
+    }
+  } else {
+    result = {
+      isWinner: false,
+      message: "Oups ! Rien cette fois-ci. Retentez votre chance !",
+      coupon: null
+    };
   }
 
+  // 3) Sauvegarder l'historique (gagné ou perdu)
   user.lastSpinAt = new Date();
   await user.save();
 
   await SpinHistory.create({
     user: user._id,
-    coupon: coupon._id
+    coupon: result.coupon ? result.coupon._id : null,
+    isWinner: result.isWinner,
+    date: new Date()
   });
 
-  await notificationService.sendNotification(
-    user._id,
-    'spin_won',
-    `Félicitations ! Vous avez gagné le coupon "${coupon.title}"`
-  );
-
+  // 4) Calculer les jeux restants
   const jeuRestant = 3 - (howManyTimesToday + 1);
 
   return {
-    message: "Bravo, vous avez gagné !",
-    coupon,
-    jeuRestant: jeuRestant
+    ...result,
+    jeuRestant: jeuRestant,
+    totalSpinsToday: howManyTimesToday + 1
   };
 };
 
+// Fonction pour récupérer l'historique
 exports.getUserSpinHistory = async (userId) => {
   return await SpinHistory.find({ user: userId })
     .sort({ date: -1 })
-    .populate('coupon', 'title description discount');
+    .populate('coupon', 'title description discount isExclusif')
+    .limit(10); // Limiter à 10 derniers résultats
 };
+

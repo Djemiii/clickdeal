@@ -15,6 +15,7 @@ const couponSchema = new mongoose.Schema({
   downloads: { type: Number, default: 0 },
   conversions: { type: Number, default: 0 },
   isApproved: { type: Boolean, default: false },
+  isExclusif: { type: Boolean, default: false },
   qrCode: String, // base64 image
   company: {
     type: mongoose.Schema.Types.ObjectId,

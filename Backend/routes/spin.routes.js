@@ -1,3 +1,5 @@
+// routes/spin.routes.js
+
 const express = require('express');
 const router = express.Router();
 const spinCtrl = require('../controllers/spin.controller');
@@ -14,7 +16,7 @@ const { protect } = require('../middlewares/auth.middleware');
  * @swagger
  * /spin:
  *   post:
- *     summary: Tourner la roue (une fois par jour)
+ *     summary: Tourner la roue (max 3 fois par jour)
  *     tags: [Spin]
  *     security:
  *       - bearerAuth: []
@@ -34,39 +36,23 @@ router.post('/', protect, spinCtrl.spinWheel);
  *       - bearerAuth: []
  *     responses:
  *       200:
- *         description: Liste des coupons gagnés par spin
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 type: object
- *                 properties:
- *                   _id:
- *                     type: string
- *                     example: "66511ee4b32d9b34a97bb7c0"
- *                   coupon:
- *                     type: object
- *                     properties:
- *                       _id:
- *                         type: string
- *                         example: "664ff04df27e99c3d88d6ed8"
- *                       title:
- *                         type: string
- *                         example: "Promo -10%"
- *                       description:
- *                         type: string
- *                         example: "Valable dans tous les magasins"
- *                       discount:
- *                         type: number
- *                         example: 10
- *                   date:
- *                     type: string
- *                     format: date-time
- *                     example: "2025-05-21T14:20:00.000Z"
- *       401:
- *         description: Non autorisé
+ *         description: Liste des coupons gagnés ou perdus
  */
-router.get('/history', protect, spinCtrl.getSpinHistory);
+router.get('/history', protect, spinCtrl.getMySpinHistory);
+
+/**
+ * @swagger
+ * /spin/info:
+ *   get:
+ *     summary: Obtenir le nombre de tours restants pour aujourd'hui
+ *     tags: [Spin]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Infos sur les possibilités de spin restantes
+ */
+router.get('/info', protect, spinCtrl.getSpinInfo);
+
 
 module.exports = router;

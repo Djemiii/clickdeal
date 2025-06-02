@@ -28,7 +28,7 @@ app.use(cors({
   ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
-  
+
 }));
 app.use(express.json());
 app.use(morgan('dev'));
@@ -50,9 +50,6 @@ setupSwagger(app);
 // Gestion globale des erreurs
 app.use(errorHandler);
 
-app.get('/ping', (req, res) => {
-  res.send('pong');
-});
 
 
 module.exports = app;
