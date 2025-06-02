@@ -27,54 +27,62 @@ const connect = async () => {
 
 const seed = async () => {
   try {
-    // Nettoyage
     await User.deleteMany();
     await Coupon.deleteMany();
 
-    // Création d'un utilisateur entreprise
+    // Crée une entreprise
     const company = await User.create({
       name: 'Entreprise Cool',
       email: 'company@example.com',
       password: '123456789',
       role: 'entreprise',
       secteurActivite: 'Technologie',
-      description: 'Une entreprise innovante',
+      description: 'Une entreprise innovante et durable',
       phone: faker.phone.number(),
       website: faker.internet.url(),
+      logo: 'uploads/logos/demo-logo.png', // chemin de test
+      isVisible: true
     });
 
-    // Création de 4 utilisateurs consommateurs
+    // Crée 4 consommateurs
     for (let i = 0; i < 4; i++) {
       await User.create({
         name: faker.person.fullName(),
         email: faker.internet.email(),
         password: '123456',
-        role: 'consommateur'
+        role: 'consommateur',
       });
     }
 
-    // Vérifie que le dossier qrcodes existe
     const qrDir = path.join(__dirname, 'uploads/qrcodes');
     if (!fs.existsSync(qrDir)) {
       fs.mkdirSync(qrDir, { recursive: true });
     }
 
-    // Création de 10 coupons avec codes et QR codes
-    for (let i = 0; i < 10; i++) {
+    // Catégories fictives
+    const categories = ['Beauté', 'Électronique', 'Mode', 'Alimentation', 'Voyage', 'Maison'];
+    const villes = ['Paris', 'Lyon', 'Marseille', 'Toulouse', 'Nice', 'Bordeaux'];
+
+    // Création de 20 coupons
+    for (let i = 0; i < 20; i++) {
       const code = generateCouponCode();
-      const qrPath = await generateQRCode(code); // retourne le chemin complet
+      const qrPath = await generateQRCode(code);
 
       await Coupon.create({
         title: faker.commerce.productName(),
         description: faker.commerce.productDescription(),
         code,
-        discount: faker.number.int({ min: 5, max: 50 }),
-        category: faker.commerce.department(),
-        location: faker.location.city(),
-        startDate: faker.date.recent(),
-        endDate: faker.date.soon({ days: 30 }),
-        conditions: 'Valable uniquement en magasin',
-        isApproved: true,
+        discount: faker.number.int({ min: 10, max: 70 }),
+        category: faker.helpers.arrayElement(categories),
+        location: faker.helpers.arrayElement(villes),
+        startDate: faker.date.past({ years: 1 }),
+        endDate: faker.date.future({ months: 2 }),
+        conditions: faker.lorem.sentence(),
+        isApproved: faker.datatype.boolean(),
+        isExclusif: faker.datatype.boolean(),
+        views: faker.number.int({ min: 0, max: 300 }),
+        downloads: faker.number.int({ min: 0, max: 200 }),
+        conversions: faker.number.int({ min: 0, max: 100 }),
         qrCode: qrPath,
         company: company._id
       });
