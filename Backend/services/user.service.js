@@ -22,8 +22,8 @@ exports.uploadLogo = async (userId, file) => {
   const user = await User.findById(userId);
   if (!user) throw new AppError('Utilisateur introuvable', 404);
 
-  user.logo = file.path;
+  user.logo = `/uploads/logos/${file.filename}`;
   await user.save();
 
-  return file.path;
+  return user.logo;
 };

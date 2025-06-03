@@ -16,7 +16,6 @@ const fileFilter = (req, file, cb) => {
   if (['.png', '.jpg', '.jpeg'].includes(ext)) cb(null, true);
   else cb(new Error('Format de fichier non autorisé'), false);
 };
-
 const upload = multer({ storage, fileFilter });
 
 module.exports = upload;

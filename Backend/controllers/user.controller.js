@@ -22,6 +22,8 @@ exports.uploadLogo = async (req, res, next) => {
   try {
     const logoPath = await userService.uploadLogo(req.user.id, req.file);
     res.status(200).json({ logo: logoPath });
+    console.log('file',req.file);
+    
   } catch (err) {
     next(err);
   }
